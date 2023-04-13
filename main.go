@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"myGram/entities"
+	"myGram/routers"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -32,6 +33,6 @@ func init() {
 }
 
 func main() {
-	// var PORT = ":4000"
-	// routers.StartService(db).Run(PORT)
+	var PORT = ":4000"
+	routers.StartService(db).Run(PORT)
 }
