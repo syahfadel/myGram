@@ -11,10 +11,10 @@ import (
 
 type User struct {
 	ID           uint   `gorm:"primaryKey" json:"id"`
-	Username     string `gorm:"not null;uniqueIndex" json:"username"`
+	Username     string `gorm:"not null;uniqueIndex" valid:"required" json:"username"`
 	Email        string `gorm:"not null;uniqueIndex" form:"email" valid:"required,email"`
 	Password     string `gorm:"not null" form:"password" valid:"required,length(6|50)"`
-	Age          uint   `gorm:"not null" valid:"required,range(8|100)"`
+	Age          uint   `gorm:"not null" valid:"required,range(9|100)"`
 	Photos       []Photo
 	Socialmedias []Socialmedia
 	Comments     []Comment
