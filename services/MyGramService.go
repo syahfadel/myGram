@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+	"fmt"
 	"myGram/entities"
 
 	"gorm.io/gorm"
@@ -24,28 +26,45 @@ func (ms *MyGramService) Login(user entities.User) (entities.User, error) {
 	return user, nil
 }
 
-func (ms *MyGramService) GetAllPhoto() error {
-	//todo
-	return nil
+func (ms *MyGramService) GetAllPhoto() ([]entities.Photo, error) {
+	var photos []entities.Photo
+	if err := ms.DB.Debug().Find(&photos).Error; err != nil {
+		return []entities.Photo{}, err
+	}
+	return photos, nil
 }
 
-func (ms *MyGramService) GetOnePhoto() error {
-	//todo
-	return nil
+func (ms *MyGramService) GetOnePhoto(id uint) (entities.Photo, error) {
+	var photo entities.Photo
+	if err := ms.DB.Debug().Where("id = ?", id).Take(&photo).Error; err != nil {
+		return entities.Photo{}, err
+	}
+	return photo, nil
 }
 
-func (ms *MyGramService) CreatePhoto() error {
-	//todo
-	return nil
+func (ms *MyGramService) CreatePhoto(photo entities.Photo) (entities.Photo, error) {
+	if err := ms.DB.Debug().Create(&photo).Error; err != nil {
+		return entities.Photo{}, err
+	}
+	return photo, nil
 }
 
-func (ms *MyGramService) UpdatePhoto() error {
-	//todo
-	return nil
+func (ms *MyGramService) UpdatePhoto(photo entities.Photo) (entities.Photo, error) {
+	res := ms.DB.Debug().Model(&photo).Where("id = ? AND user_id = ?", photo.ID, photo.UserID).Updates(&photo)
+	if res.Error != nil {
+		return entities.Photo{}, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return entities.Photo{}, errors.New("no data updated")
+	}
+	return photo, nil
 }
 
-func (ms *MyGramService) DeletePhoto() error {
-	//todo
+func (ms *MyGramService) DeletePhoto(photoId, userId uint) error {
+	result := ms.DB.Debug().Where("user_id = ? AND id = ?", userId, photoId).Delete(&entities.Photo{})
+	if result.RowsAffected == 0 {
+		return errors.New(fmt.Sprintf("Post with userId %v and photoId %v not available", userId, photoId))
+	}
 	return nil
 }
 

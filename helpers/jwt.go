@@ -27,7 +27,7 @@ func GenerateToken(id uint, email, username string) string {
 func VerifyToken(ctx *gin.Context) (interface{}, error) {
 	errResponse := errors.New("sign in to proceed")
 	headerToken := ctx.Request.Header.Get("Authorization")
-	bearer := strings.HasPrefix(headerToken, "bearer")
+	bearer := strings.HasPrefix(headerToken, "Bearer")
 
 	if !bearer {
 		return nil, errResponse

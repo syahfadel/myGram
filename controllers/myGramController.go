@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"fmt"
 	"myGram/entities"
 	"myGram/helpers"
 	"myGram/services"
 	"net/http"
+	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -20,6 +23,12 @@ type RequestUser struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Age      uint   `json:"age"`
+}
+
+type RequestPhoto struct {
+	Title    string `json:"title"`
+	Caption  string `json:"caption"`
+	PhotoUrl string `json:"photo_url"`
 }
 
 func (mc *MyGramController) Register(ctx *gin.Context) {
@@ -52,12 +61,11 @@ func (mc *MyGramController) Register(ctx *gin.Context) {
 		"status": "success",
 		"result": result,
 	})
-
 }
 
 func (mc *MyGramController) Login(ctx *gin.Context) {
 	var requestUser RequestUser
-	if err := ctx.ShouldBind(&requestUser); err != nil {
+	if err := ctx.ShouldBindJSON(&requestUser); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"status":  "failed",
 			"message": err.Error(),
@@ -98,23 +106,154 @@ func (mc *MyGramController) Login(ctx *gin.Context) {
 }
 
 func (mc *MyGramController) GetAllPhoto(ctx *gin.Context) {
-	// TO DO
+	result, err := mc.MyGramService.GetAllPhoto()
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) GetOnePhoto(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	photoID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	photo, err := mc.MyGramService.GetOnePhoto(uint(photoID))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   photo,
+	})
+
 }
 
 func (mc *MyGramController) CreatePhoto(ctx *gin.Context) {
-	// TO DO
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+	var requestPhoto RequestPhoto
+	if err := ctx.ShouldBindJSON(&requestPhoto); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	photo := entities.Photo{
+		Title:    requestPhoto.Title,
+		Caption:  requestPhoto.Caption,
+		PhotoUrl: requestPhoto.PhotoUrl,
+		UserID:   uint(userId),
+	}
+
+	result, err := mc.MyGramService.CreatePhoto(photo)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) UpdatePhoto(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	photoID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+	var requestPhoto RequestPhoto
+	if err := ctx.ShouldBindJSON(&requestPhoto); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	photo := entities.Photo{
+		ID:       uint(photoID),
+		Title:    requestPhoto.Title,
+		Caption:  requestPhoto.Caption,
+		PhotoUrl: requestPhoto.PhotoUrl,
+		UserID:   uint(userId),
+	}
+
+	result, err := mc.MyGramService.UpdatePhoto(photo)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) DeletePhoto(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	photoID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+	err = mc.MyGramService.DeletePhoto(uint(photoID), uint(userId))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+	})
 }
 
 func (mc *MyGramController) GetAllComment(ctx *gin.Context) {

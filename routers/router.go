@@ -2,6 +2,7 @@ package routers
 
 import (
 	"myGram/controllers"
+	"myGram/middlewares"
 	"myGram/services"
 
 	"github.com/gin-gonic/gin"
@@ -26,13 +27,14 @@ func StartService(db *gorm.DB) *gin.Engine {
 		user.POST("/login", myGramController.Login)
 	}
 
+	app.Use(middlewares.Authentication())
 	photo := app.Group("/photo")
 	{
 		photo.GET("/getAll", myGramController.GetAllPhoto)
-		photo.GET("/getOne", myGramController.GetOnePhoto)
+		photo.GET("/getOne/:id", myGramController.GetOnePhoto)
 		photo.POST("/createPhoto", myGramController.CreatePhoto)
-		photo.PUT("/updatePhoto", myGramController.UpdatePhoto)
-		photo.DELETE("/deletePhoto", myGramController.DeletePhoto)
+		photo.PUT("/updatePhoto/:id", myGramController.UpdatePhoto)
+		photo.DELETE("/deletePhoto/:id", myGramController.DeletePhoto)
 	}
 
 	comment := app.Group("/comment")
