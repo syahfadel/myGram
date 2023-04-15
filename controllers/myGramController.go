@@ -31,6 +31,16 @@ type RequestPhoto struct {
 	PhotoUrl string `json:"photo_url"`
 }
 
+type RequestComment struct {
+	PhotoID uint   `json:"photo_id"`
+	Message string `json:"message"`
+}
+
+type RequestSocialMedia struct {
+	SocialMediaUrl string `json:"social_media_url"`
+	Name           string `json:"name"`
+}
+
 func (mc *MyGramController) Register(ctx *gin.Context) {
 	var requestUser RequestUser
 	if err := ctx.ShouldBindJSON(&requestUser); err != nil {
@@ -145,7 +155,6 @@ func (mc *MyGramController) GetOnePhoto(ctx *gin.Context) {
 		"status": "success",
 		"data":   photo,
 	})
-
 }
 
 func (mc *MyGramController) CreatePhoto(ctx *gin.Context) {
@@ -257,41 +266,314 @@ func (mc *MyGramController) DeletePhoto(ctx *gin.Context) {
 }
 
 func (mc *MyGramController) GetAllComment(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	photoID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	result, err := mc.MyGramService.GetAllComment(uint(photoID))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) GetOneComment(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	commentID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	comment, err := mc.MyGramService.GetOneComment(uint(commentID))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   comment,
+	})
 }
 
 func (mc *MyGramController) CreateComment(ctx *gin.Context) {
-	// TO DO
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+	var requestComment RequestComment
+	if err := ctx.ShouldBindJSON(&requestComment); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	comment := entities.Comment{
+		PhotoID: requestComment.PhotoID,
+		Message: requestComment.Message,
+		UserID:  uint(userId),
+	}
+
+	result, err := mc.MyGramService.CreateComment(comment)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) UpdateComment(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	commentID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+	var requestComment RequestComment
+	if err := ctx.ShouldBindJSON(&requestComment); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	comment := entities.Comment{
+		ID:      uint(commentID),
+		Message: requestComment.Message,
+		PhotoID: requestComment.PhotoID,
+		UserID:  uint(userId),
+	}
+
+	result, err := mc.MyGramService.UpdateComment(comment)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) DeleteComment(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	commentID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+	err = mc.MyGramService.DeleteComment(uint(commentID), uint(userId))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+	})
 }
 
 func (mc *MyGramController) GetAllSocialMedia(ctx *gin.Context) {
-	// TO DO
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userID := userData["id"].(float64)
+
+	result, err := mc.MyGramService.GetAllSocialMedia(uint(userID))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) GetOneSocialMedia(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	smID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+
+	result, err := mc.MyGramService.GetOneSocialMedia(uint(smID), uint(userId))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) CreateSocialMedia(ctx *gin.Context) {
-	// TO DO
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+	var requestSocialMedia RequestSocialMedia
+	if err := ctx.ShouldBindJSON(&requestSocialMedia); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	socialMedia := entities.Socialmedia{
+		SocialMediaUrl: requestSocialMedia.SocialMediaUrl,
+		Name:           requestSocialMedia.Name,
+		UserID:         uint(userId),
+	}
+
+	result, err := mc.MyGramService.CreateSocialMedia(socialMedia)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) UpdateSocialMedia(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	smID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+	var requestSocialMedia RequestSocialMedia
+	if err := ctx.ShouldBindJSON(&requestSocialMedia); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	SocialMedia := entities.Socialmedia{
+		ID:             uint(smID),
+		Name:           requestSocialMedia.Name,
+		SocialMediaUrl: requestSocialMedia.SocialMediaUrl,
+		UserID:         uint(userId),
+	}
+
+	result, err := mc.MyGramService.UpdateSocialMedia(SocialMedia)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
 }
 
 func (mc *MyGramController) DeleteSocialMedia(ctx *gin.Context) {
-	// TO DO
+	id := ctx.Param("id")
+	smID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":        "failed",
+			"error_status":  "wrong parameter",
+			"error_message": fmt.Sprintf("%v not an integer", id),
+		})
+		return
+	}
+
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userId := userData["id"].(float64)
+	err = mc.MyGramService.DeleteSocialMedia(uint(smID), uint(userId))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+	})
 }

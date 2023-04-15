@@ -39,20 +39,20 @@ func StartService(db *gorm.DB) *gin.Engine {
 
 	comment := app.Group("/comment")
 	{
-		comment.GET("/getAll", myGramController.GetAllComment)
-		comment.GET("/getOne", myGramController.GetOneComment)
+		comment.GET("/getAll/:id", myGramController.GetAllComment)
+		comment.GET("/getOne/:id", myGramController.GetOneComment)
 		comment.POST("/createComment", myGramController.CreateComment)
-		comment.PUT("/updateComment", myGramController.UpdateComment)
-		comment.DELETE("/deleteComment", myGramController.DeleteComment)
+		comment.PUT("/updateComment/:id", myGramController.UpdateComment)
+		comment.DELETE("/deleteComment/:id", myGramController.DeleteComment)
 	}
 
 	socialMedia := app.Group("/socialMedia")
 	{
-		socialMedia.GET("/getAll", myGramController.GetAllSocialMedia)
-		socialMedia.GET("/getOne", myGramController.GetOneSocialMedia)
+		socialMedia.GET("/getAll/", myGramController.GetAllSocialMedia)
+		socialMedia.GET("/getOne/:id", myGramController.GetOneSocialMedia)
 		socialMedia.POST("/createSocialMedia", myGramController.CreateSocialMedia)
-		socialMedia.PUT("/updateSocialMedia", myGramController.UpdateSocialMedia)
-		socialMedia.DELETE("/deleteSocialMedia", myGramController.DeleteSocialMedia)
+		socialMedia.PUT("/updateSocialMedia/:id", myGramController.UpdateSocialMedia)
+		socialMedia.DELETE("/deleteSocialMedia/:id", myGramController.DeleteSocialMedia)
 	}
 
 	return app

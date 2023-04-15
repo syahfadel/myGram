@@ -68,52 +68,86 @@ func (ms *MyGramService) DeletePhoto(photoId, userId uint) error {
 	return nil
 }
 
-func (ms *MyGramService) GetAllComment() error {
-	//todo
+func (ms *MyGramService) GetAllComment(photoID uint) ([]entities.Comment, error) {
+	var comments []entities.Comment
+	if err := ms.DB.Debug().Where("photo_id = ?", photoID).Find(&comments).Error; err != nil {
+		return []entities.Comment{}, err
+	}
+	return comments, nil
+}
+
+func (ms *MyGramService) GetOneComment(id uint) (entities.Comment, error) {
+	var comment entities.Comment
+	if err := ms.DB.Debug().Where("id = ?", id).Take(&comment).Error; err != nil {
+		return entities.Comment{}, err
+	}
+	return comment, nil
+}
+
+func (ms *MyGramService) CreateComment(comment entities.Comment) (entities.Comment, error) {
+	if err := ms.DB.Debug().Create(&comment).Error; err != nil {
+		return entities.Comment{}, err
+	}
+	return comment, nil
+}
+
+func (ms *MyGramService) UpdateComment(comment entities.Comment) (entities.Comment, error) {
+	res := ms.DB.Debug().Model(&comment).Where("id = ? AND user_id = ? AND photo_id = ?", comment.ID, comment.UserID, comment.PhotoID).Updates(&comment)
+	if res.Error != nil {
+		return entities.Comment{}, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return entities.Comment{}, errors.New("no data updated")
+	}
+	return comment, nil
+}
+
+func (ms *MyGramService) DeleteComment(commentId, userId uint) error {
+	result := ms.DB.Debug().Where("user_id = ? AND id = ?", userId, commentId).Delete(&entities.Comment{})
+	if result.RowsAffected == 0 {
+		return errors.New(fmt.Sprintf("Post with userId %v and commentId %v not available", userId, commentId))
+	}
 	return nil
 }
 
-func (ms *MyGramService) GetOneComment() error {
-	//todo
-	return nil
+func (ms *MyGramService) GetAllSocialMedia(userID uint) ([]entities.Socialmedia, error) {
+	var socialMedia []entities.Socialmedia
+	if err := ms.DB.Debug().Where("user_id = ?", userID).Find(&socialMedia).Error; err != nil {
+		return []entities.Socialmedia{}, err
+	}
+	return socialMedia, nil
 }
 
-func (ms *MyGramService) CreateComment() error {
-	//todo
-	return nil
+func (ms *MyGramService) GetOneSocialMedia(id, userID uint) (entities.Socialmedia, error) {
+	var socialMedia entities.Socialmedia
+	if err := ms.DB.Debug().Where("id = ? AND user_id = ?", id, userID).Take(&socialMedia).Error; err != nil {
+		return entities.Socialmedia{}, err
+	}
+	return socialMedia, nil
 }
 
-func (ms *MyGramService) UpdateComment() error {
-	//todo
-	return nil
+func (ms *MyGramService) CreateSocialMedia(socialMedia entities.Socialmedia) (entities.Socialmedia, error) {
+	if err := ms.DB.Debug().Create(&socialMedia).Error; err != nil {
+		return entities.Socialmedia{}, err
+	}
+	return socialMedia, nil
 }
 
-func (ms *MyGramService) DeleteComment() error {
-	//todo
-	return nil
+func (ms *MyGramService) UpdateSocialMedia(socialMedia entities.Socialmedia) (entities.Socialmedia, error) {
+	res := ms.DB.Debug().Model(&socialMedia).Where("id = ? AND user_id = ?", socialMedia.ID, socialMedia.UserID).Updates(&socialMedia)
+	if res.Error != nil {
+		return entities.Socialmedia{}, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return entities.Socialmedia{}, errors.New("no data updated")
+	}
+	return socialMedia, nil
 }
 
-func (ms *MyGramService) GetAllSocialMedia() error {
-	//todo
-	return nil
-}
-
-func (ms *MyGramService) GetOneSocialMedia() error {
-	//todo
-	return nil
-}
-
-func (ms *MyGramService) CreateSocialMedia() error {
-	//todo
-	return nil
-}
-
-func (ms *MyGramService) UpdateSocialMedia() error {
-	//todo
-	return nil
-}
-
-func (ms *MyGramService) DeleteSocialMedia() error {
-	//todo
+func (ms *MyGramService) DeleteSocialMedia(smId, userId uint) error {
+	result := ms.DB.Debug().Where("user_id = ? AND id = ?", userId, smId).Delete(&entities.Socialmedia{})
+	if result.RowsAffected == 0 {
+		return errors.New(fmt.Sprintf("Post with userId %v and smId %v not available", userId, smId))
+	}
 	return nil
 }
