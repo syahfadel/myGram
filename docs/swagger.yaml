@@ -1,0 +1,552 @@
+basePath: /
+definitions:
+  controllers.RequestComment:
+    properties:
+      message:
+        type: string
+      photo_id:
+        type: integer
+    type: object
+  controllers.RequestPhoto:
+    properties:
+      caption:
+        type: string
+      photo_url:
+        type: string
+      title:
+        type: string
+    type: object
+  controllers.RequestSocialMedia:
+    properties:
+      name:
+        type: string
+      social_media_url:
+        type: string
+    type: object
+  controllers.RequestUser:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  entities.Comment:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      message:
+        type: string
+      photo_id:
+        type: integer
+      updatedAt:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  entities.Photo:
+    properties:
+      caption:
+        type: string
+      comments:
+        items:
+          $ref: '#/definitions/entities.Comment'
+        type: array
+      created_at:
+        type: string
+      id:
+        type: integer
+      photo_url:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  entities.Socialmedia:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      social_media_url:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  entities.User:
+    properties:
+      age:
+        type: integer
+      comments:
+        items:
+          $ref: '#/definitions/entities.Comment'
+        type: array
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      photos:
+        items:
+          $ref: '#/definitions/entities.Photo'
+        type: array
+      socialmedias:
+        items:
+          $ref: '#/definitions/entities.Socialmedia'
+        type: array
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:4000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+  description: This is a API for MyGram application.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: MyGram API
+  version: "1.0"
+paths:
+  /comment/createComment:
+    post:
+      consumes:
+      - application/json
+      description: Post a Comment
+      parameters:
+      - description: CreateComment
+        in: body
+        name: requestComment
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RequestComment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Comment'
+      security:
+      - ApiKeyAuth: []
+      summary: Post a Comment
+      tags:
+      - post Comment
+  /comment/deleteComment/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Comment
+      parameters:
+      - description: Delete Comment Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a Comment
+      tags:
+      - Delete a Comment
+  /comment/getAll:
+    get:
+      consumes:
+      - application/json
+      description: Get All Comment
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Comment'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Comment
+      tags:
+      - Get All Comment
+  /comment/getOne/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a Comment
+      parameters:
+      - description: Get comment Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Comment'
+      security:
+      - ApiKeyAuth: []
+      summary: Get a Comment
+      tags:
+      - Get a Comment
+  /comment/updateComment/{id}:
+    put:
+      consumes:
+      - application/json
+      description: update a Comment
+      parameters:
+      - description: CreateComment
+        in: body
+        name: requestComment
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RequestComment'
+      - description: Get Comment Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Comment'
+      security:
+      - ApiKeyAuth: []
+      summary: update a Comment
+      tags:
+      - update a Comment
+  /middleware/jwt:
+    get:
+      description: Middleware untuk memverifikasi token JWT dan memeriksa apakah pengguna
+        memiliki hak akses ke endpoint tertentu
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Middleware untuk autentikasi menggunakan JWT
+      tags:
+      - middleware
+  /photo/createPhoto:
+    post:
+      consumes:
+      - application/json
+      description: Post a Photo
+      parameters:
+      - description: CreatePhoto
+        in: body
+        name: requestPhoto
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RequestPhoto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Photo'
+      security:
+      - ApiKeyAuth: []
+      summary: Post a Photo
+      tags:
+      - post photo
+  /photo/deletePhoto/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Photo
+      parameters:
+      - description: Delete Photo Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a Photo
+      tags:
+      - Delete a photo
+  /photo/getAll:
+    get:
+      consumes:
+      - application/json
+      description: Get All Photo
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Photo'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Photo
+      tags:
+      - Get All photo
+  /photo/getOne/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a Photo
+      parameters:
+      - description: Get Photo Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Photo'
+      security:
+      - ApiKeyAuth: []
+      summary: Get a Photo
+      tags:
+      - Get a photo
+  /photo/updatePhoto/{id}:
+    put:
+      consumes:
+      - application/json
+      description: update a Photo
+      parameters:
+      - description: CreatePhoto
+        in: body
+        name: requestPhoto
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RequestPhoto'
+      - description: Get Photo Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Photo'
+      security:
+      - ApiKeyAuth: []
+      summary: update a Photo
+      tags:
+      - update a photo
+  /socialMedia/createSocialMedia:
+    post:
+      consumes:
+      - application/json
+      description: Post a Social Media
+      parameters:
+      - description: CreateSocialMedia
+        in: body
+        name: requestSocialMedia
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RequestSocialMedia'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Socialmedia'
+      security:
+      - ApiKeyAuth: []
+      summary: Post a Social Media
+      tags:
+      - post Social Media
+  /socialMedia/deleteSocialMedia/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Social Media
+      parameters:
+      - description: Delete Social Media Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a Social Media
+      tags:
+      - Delete a Social Media
+  /socialMedia/getAll:
+    get:
+      consumes:
+      - application/json
+      description: Get All SocialMedia
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Socialmedia'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All SocialMedia
+      tags:
+      - Get All SocialMedia
+  /socialMedia/getOne/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a Social Media
+      parameters:
+      - description: Get Photo Social Media
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Get Social Media Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Socialmedia'
+      security:
+      - ApiKeyAuth: []
+      summary: Get a Social Media
+      tags:
+      - Get a Social Media
+  /socialMedia/updateSocialMedia/{id}:
+    put:
+      consumes:
+      - application/json
+      description: update a Social Media
+      parameters:
+      - description: CreateSocialMedia
+        in: body
+        name: requestSocialMedia
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RequestSocialMedia'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Socialmedia'
+      security:
+      - ApiKeyAuth: []
+      summary: update a Social Media
+      tags:
+      - update a Social Media
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Login to account
+      parameters:
+      - description: Login
+        in: body
+        name: RequestUser
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RequestUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Login to account
+      tags:
+      - login
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Create an account
+      parameters:
+      - description: Register
+        in: body
+        name: RequestUser
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RequestUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.User'
+      summary: Create an account
+      tags:
+      - register
+swagger: "2.0"

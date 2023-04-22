@@ -41,6 +41,15 @@ type RequestSocialMedia struct {
 	Name           string `json:"name"`
 }
 
+// Create User
+// @Summary      Create an account
+// @Description  Create an account
+// @Tags         register
+// @Accept       json
+// @Produce      json
+// @Param        RequestUser    body      RequestUser  true  "Register"
+// @Success      200  {object}  entities.User
+// @Router       /user/register [post]
 func (mc *MyGramController) Register(ctx *gin.Context) {
 	var requestUser RequestUser
 	if err := ctx.ShouldBindJSON(&requestUser); err != nil {
@@ -73,6 +82,15 @@ func (mc *MyGramController) Register(ctx *gin.Context) {
 	})
 }
 
+// Login
+// @Summary      Login to account
+// @Description  Login to account
+// @Tags         login
+// @Accept       json
+// @Produce      json
+// @Param        RequestUser    body      RequestUser  true  "Login"
+// @Success      200  {object}  string
+// @Router       /user/login [post]
 func (mc *MyGramController) Login(ctx *gin.Context) {
 	var requestUser RequestUser
 	if err := ctx.ShouldBindJSON(&requestUser); err != nil {
@@ -115,6 +133,15 @@ func (mc *MyGramController) Login(ctx *gin.Context) {
 	})
 }
 
+// Get All Photo
+// @Summary      Get All Photo
+// @Description  Get All Photo
+// @Tags         Get All photo
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Success      200  {object}  entities.Photo
+// @Router       /photo/getAll [get]
 func (mc *MyGramController) GetAllPhoto(ctx *gin.Context) {
 	result, err := mc.MyGramService.GetAllPhoto()
 	if err != nil {
@@ -130,6 +157,16 @@ func (mc *MyGramController) GetAllPhoto(ctx *gin.Context) {
 	})
 }
 
+// Get a Photo
+// @Summary      Get a Photo
+// @Description  Get a Photo
+// @Tags         Get a photo
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        id    path      int  true  "Get Photo Id"
+// @Success      200  {object}  entities.Photo
+// @Router       /photo/getOne/{id} [get]
 func (mc *MyGramController) GetOnePhoto(ctx *gin.Context) {
 	id := ctx.Param("id")
 	photoID, err := strconv.Atoi(id)
@@ -157,6 +194,16 @@ func (mc *MyGramController) GetOnePhoto(ctx *gin.Context) {
 	})
 }
 
+// Create Post Photo
+// @Summary      Post a Photo
+// @Description  Post a Photo
+// @Tags         post photo
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        requestPhoto    body      RequestPhoto  true  "CreatePhoto"
+// @Success      200  {object}  entities.Photo
+// @Router       /photo/createPhoto [post]
 func (mc *MyGramController) CreatePhoto(ctx *gin.Context) {
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userId := userData["id"].(float64)
@@ -191,6 +238,17 @@ func (mc *MyGramController) CreatePhoto(ctx *gin.Context) {
 	})
 }
 
+// update a Photo
+// @Summary      update a Photo
+// @Description  update a Photo
+// @Tags         update a photo
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        requestPhoto    body      RequestPhoto  true  "CreatePhoto"
+// @Param        id    path      int  true  "Get Photo Id"
+// @Success      200  {object}  entities.Photo
+// @Router       /photo/updatePhoto/{id} [put]
 func (mc *MyGramController) UpdatePhoto(ctx *gin.Context) {
 	id := ctx.Param("id")
 	photoID, err := strconv.Atoi(id)
@@ -237,6 +295,16 @@ func (mc *MyGramController) UpdatePhoto(ctx *gin.Context) {
 	})
 }
 
+// Delete a Photo
+// @Summary      Delete a Photo
+// @Description  Delete a Photo
+// @Tags         Delete a photo
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        id    path      int  true  "Delete Photo Id"
+// @Success      200  {object}  string
+// @Router       /photo/deletePhoto/{id} [delete]
 func (mc *MyGramController) DeletePhoto(ctx *gin.Context) {
 	id := ctx.Param("id")
 	photoID, err := strconv.Atoi(id)
@@ -265,6 +333,15 @@ func (mc *MyGramController) DeletePhoto(ctx *gin.Context) {
 	})
 }
 
+// Get All Comment
+// @Summary      Get All Comment
+// @Description  Get All Comment
+// @Tags         Get All Comment
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Success      200  {object}  entities.Comment
+// @Router       /comment/getAll [get]
 func (mc *MyGramController) GetAllComment(ctx *gin.Context) {
 	id := ctx.Param("id")
 	photoID, err := strconv.Atoi(id)
@@ -291,6 +368,16 @@ func (mc *MyGramController) GetAllComment(ctx *gin.Context) {
 	})
 }
 
+// Get a Comment
+// @Summary      Get a Comment
+// @Description  Get a Comment
+// @Tags         Get a Comment
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        id    path      int  true  "Get comment Id"
+// @Success      200  {object}  entities.Comment
+// @Router       /comment/getOne/{id} [get]
 func (mc *MyGramController) GetOneComment(ctx *gin.Context) {
 	id := ctx.Param("id")
 	commentID, err := strconv.Atoi(id)
@@ -318,6 +405,16 @@ func (mc *MyGramController) GetOneComment(ctx *gin.Context) {
 	})
 }
 
+// Create Comment
+// @Summary      Post a Comment
+// @Description  Post a Comment
+// @Tags         post Comment
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        requestComment    body      RequestComment  true  "CreateComment"
+// @Success      200  {object}  entities.Comment
+// @Router       /comment/createComment [post]
 func (mc *MyGramController) CreateComment(ctx *gin.Context) {
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userId := userData["id"].(float64)
@@ -351,6 +448,17 @@ func (mc *MyGramController) CreateComment(ctx *gin.Context) {
 	})
 }
 
+// update a Comment
+// @Summary      update a Comment
+// @Description  update a Comment
+// @Tags         update a Comment
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        requestComment    body      RequestComment  true  "CreateComment"
+// @Param        id    path      int  true  "Get Comment Id"
+// @Success      200  {object}  entities.Comment
+// @Router       /comment/updateComment/{id} [put]
 func (mc *MyGramController) UpdateComment(ctx *gin.Context) {
 	id := ctx.Param("id")
 	commentID, err := strconv.Atoi(id)
@@ -396,6 +504,16 @@ func (mc *MyGramController) UpdateComment(ctx *gin.Context) {
 	})
 }
 
+// Delete a Comment
+// @Summary      Delete a Comment
+// @Description  Delete a Comment
+// @Tags         Delete a Comment
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        id    path      int  true  "Delete Comment Id"
+// @Success      200  {object}  string
+// @Router       /comment/deleteComment/{id} [delete]
 func (mc *MyGramController) DeleteComment(ctx *gin.Context) {
 	id := ctx.Param("id")
 	commentID, err := strconv.Atoi(id)
@@ -424,6 +542,15 @@ func (mc *MyGramController) DeleteComment(ctx *gin.Context) {
 	})
 }
 
+// Get All SocialMedia
+// @Summary      Get All SocialMedia
+// @Description  Get All SocialMedia
+// @Tags         Get All SocialMedia
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Success      200  {object}  entities.Socialmedia
+// @Router       /socialMedia/getAll [get]
 func (mc *MyGramController) GetAllSocialMedia(ctx *gin.Context) {
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userID := userData["id"].(float64)
@@ -442,6 +569,17 @@ func (mc *MyGramController) GetAllSocialMedia(ctx *gin.Context) {
 	})
 }
 
+// Get a Social Media
+// @Summary      Get a Social Media
+// @Description  Get a Social Media
+// @Tags         Get a Social Media
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        id    path      int  true  "Get Photo Social Media"
+// @Param        id    path      int  true  "Get Social Media Id"
+// @Success      200  {object}  entities.Socialmedia
+// @Router       /socialMedia/getOne/{id} [get]
 func (mc *MyGramController) GetOneSocialMedia(ctx *gin.Context) {
 	id := ctx.Param("id")
 	smID, err := strconv.Atoi(id)
@@ -472,6 +610,16 @@ func (mc *MyGramController) GetOneSocialMedia(ctx *gin.Context) {
 	})
 }
 
+// Create Social Media
+// @Summary      Post a Social Media
+// @Description  Post a Social Media
+// @Tags         post Social Media
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        requestSocialMedia    body      RequestSocialMedia  true  "CreateSocialMedia"
+// @Success      200  {object}  entities.Socialmedia
+// @Router       /socialMedia/createSocialMedia [post]
 func (mc *MyGramController) CreateSocialMedia(ctx *gin.Context) {
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userId := userData["id"].(float64)
@@ -505,6 +653,16 @@ func (mc *MyGramController) CreateSocialMedia(ctx *gin.Context) {
 	})
 }
 
+// update a Social Media
+// @Summary      update a Social Media
+// @Description  update a Social Media
+// @Tags         update a Social Media
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        requestSocialMedia    body      RequestSocialMedia  true  "CreateSocialMedia"
+// @Success      200  {object}  entities.Socialmedia
+// @Router       /socialMedia/updateSocialMedia/{id} [put]
 func (mc *MyGramController) UpdateSocialMedia(ctx *gin.Context) {
 	id := ctx.Param("id")
 	smID, err := strconv.Atoi(id)
@@ -550,6 +708,16 @@ func (mc *MyGramController) UpdateSocialMedia(ctx *gin.Context) {
 	})
 }
 
+// Delete a Social Media
+// @Summary      Delete a Social Media
+// @Description  Delete a Social Media
+// @Tags         Delete a Social Media
+// @Accept       json
+// @Produce      json
+// @Security 	 ApiKeyAuth
+// @Param        id    path      int  true  "Delete Social Media Id"
+// @Success      200  {object}  string
+// @Router       /socialMedia/deleteSocialMedia/{id} [delete]
 func (mc *MyGramController) DeleteSocialMedia(ctx *gin.Context) {
 	id := ctx.Param("id")
 	smID, err := strconv.Atoi(id)
